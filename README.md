@@ -1,6 +1,7 @@
 # BowlingCalculator-MVP
 Implementation of a bowling calculator using MVP
 
+![sample bowling sheet](sample/bowling_sample_result.jpg?raw=true "sample bowling sheet")
 
 ## Rules
 

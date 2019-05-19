@@ -1,0 +1,15 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="card_frame_radius">4dp</dimen>
+    <dimen name="card_frame_elevation">4dp</dimen>
+    <dimen name="card_frame_contentPadding">0dp</dimen>
+    <dimen name="card_frame_stroke_width">1dp</dimen>
+
+    <dimen name="card_child_stroke_width">0dp</dimen>
+    <dimen name="card_child_elevation">2dp</dimen>
+    <dimen name="size_card_frame">100dp</dimen>
+    <dimen name="size_card_frame_result">120dp</dimen>
+    <dimen name="width_input_score">100dp</dimen>
+
+</resources>

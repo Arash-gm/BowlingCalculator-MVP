@@ -1,0 +1,41 @@
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        
+        <item name="frameUnselected">@color/colorPrimary</item>
+        <item name="frameSelected">@color/colorAccent</item>
+    </style>
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    
+    
+    <style name="frameCardView" parent="CardView">
+        <item name="cardCornerRadius">@dimen/card_frame_radius</item>
+        <item name="cardElevation">@dimen/card_frame_elevation</item>
+        <item name="contentPadding">@dimen/card_frame_contentPadding</item>
+        <item name="cardUseCompatPadding">false</item>
+        <item name="strokeColor">?attr/frameUnselected</item>
+        <item name="strokeWidth">@dimen/card_frame_stroke_width</item>
+        <item name="cardPreventCornerOverlap">false</item>
+    </style>
+
+    <style name="child_cardView" parent="frameCardView">
+        <item name="strokeWidth">@dimen/card_child_stroke_width</item>
+        <item name="cardElevation">@dimen/card_child_elevation</item>
+    </style>
+
+    <style name="TextView">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">@dimen/size_text_h2</item>
+        <item name="android:fontFamily">@font/dagger_oblique</item>
+    </style>
+
+    <dimen name="size_text_h2">16sp</dimen>
+</resources>

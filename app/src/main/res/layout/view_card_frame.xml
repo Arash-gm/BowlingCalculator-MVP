@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="@dimen/size_card_frame"
+        android:layout_height="@dimen/size_card_frame"
+        android:alpha="0.4"
+        tools:context=".bowling.BowlingActivity">
+
+    <android.support.design.card.MaterialCardView
+            android:id="@+id/baseFrameCard"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            style="@style/frameCardView"
+            android:layout_marginEnd="8dp"
+            card_view:layout_constraintEnd_toEndOf="parent" android:layout_marginStart="8dp"
+            card_view:layout_constraintStart_toStartOf="parent" android:layout_marginTop="8dp"
+            card_view:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="8dp"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintDimensionRatio="H,1:1">
+
+        <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <android.support.design.card.MaterialCardView
+                    android:id="@+id/rootFirstAttempt"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    style="@style/child_cardView"
+                    android:layout_marginTop="4dp"
+                    card_view:layout_constraintTop_toTopOf="parent"
+                    card_view:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="4dp" card_view:layout_constraintEnd_toStartOf="@+id/rootSecondAttempt"
+                    android:layout_marginEnd="4dp" android:layout_marginBottom="4dp"
+                    card_view:layout_constraintBottom_toTopOf="@+id/rootScore">
+
+                <TextView
+                    android:id="@+id/tvFirstAttempt"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="0"
+                    style="@style/TextView"/>
+
+            </android.support.design.card.MaterialCardView>
+
+            <android.support.design.card.MaterialCardView
+                android:id="@+id/rootSecondAttempt"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                style="@style/child_cardView"
+                card_view:layout_constraintStart_toEndOf="@+id/rootFirstAttempt"
+                android:layout_marginStart="4dp"
+                card_view:layout_constraintBottom_toBottomOf="@+id/rootFirstAttempt"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="4dp"
+                card_view:layout_constraintTop_toTopOf="@+id/rootFirstAttempt">
+
+                <TextView
+                    android:id="@+id/tvSecondAttempt"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="0"
+                    style="@style/TextView"/>
+
+            </android.support.design.card.MaterialCardView>
+
+            <android.support.design.card.MaterialCardView
+                android:id="@+id/rootScore"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                style="@style/child_cardView"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="4dp"
+                card_view:layout_constraintTop_toBottomOf="@+id/rootFirstAttempt"
+                android:layout_marginBottom="4dp" card_view:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="4dp" android:layout_marginTop="4dp"
+                card_view:layout_constraintHorizontal_bias="0.0" card_view:layout_constraintVertical_bias="0.0">
+
+                <TextView
+                    android:id="@+id/tvResult"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="0"
+                    android:textColor="@color/colorAccent"
+                    style="@style/TextView"/>
+
+            </android.support.design.card.MaterialCardView>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.design.card.MaterialCardView>
+
+</android.support.constraint.ConstraintLayout>

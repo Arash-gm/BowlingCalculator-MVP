@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="frameSelected" format="reference"/>
+    <attr name="frameUnselected" format="reference"/>
+
+    <declare-styleable name="frame_cards">
+        <attr name="frameCount" format="integer" />
+    </declare-styleable>
+
+</resources>

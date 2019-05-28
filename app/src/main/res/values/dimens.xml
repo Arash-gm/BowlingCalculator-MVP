@@ -11,5 +11,6 @@
     <dimen name="size_card_frame">100dp</dimen>
     <dimen name="size_card_frame_result">120dp</dimen>
     <dimen name="width_input_score">100dp</dimen>
+    <dimen name="size_card_frame_last">120dp</dimen>
 
 </resources>

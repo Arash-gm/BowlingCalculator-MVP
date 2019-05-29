@@ -24,6 +24,7 @@ import android.support.annotation.ColorInt
 import android.util.TypedValue
 import com.arash.bowlingcalculator.R
 import com.arash.bowlingcalculator.util.util.INITIAL_FRAME_INDEX
+import com.arash.bowlingcalculator.util.util.isShotStrike
 
 /**
  * Created by Arash Golmohammadi on 5/15/2019.
@@ -106,13 +107,12 @@ class BowlingActivity : BaseActivity(),BowlingContract.View, View.OnClickListene
             .setAction("Action", null).show()
     }
 
-    override fun renderStrikeFrame(currentFrame: Frame) {
+    override fun renderStrikeFrame() {
         activeFrame?.let {
             it.findViewById<TextView>(R.id.tvFirstAttempt).text = STRIKE_SHOT.toString()
             it.findViewById<TextView>(R.id.tvResult).text = ""
-
             var tvSecondAttempt = it.findViewById<TextView>(R.id.tvSecondAttempt)
-            //tvSecondAttempt.background = ContextCompat.getDrawable(this,R.drawable.shape_triangle)
+
             tvSecondAttempt.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
             tvSecondAttempt.text = ""
         }
@@ -134,11 +134,11 @@ class BowlingActivity : BaseActivity(),BowlingContract.View, View.OnClickListene
     }
 
     override fun setLastFrameActive() {
-        activeFrame = frameResult.findViewById<TextView>(R.id.frameResultCardView)
+        //activeFrame = frameResult.findViewById<TextView>(R.id.frameResultCardView)
     }
 
     override fun setResultFirstAttempt(isStrike: Boolean, isSpare: Boolean, score: Int) {
-        var tvFirstAttempt = frameResult.findViewById<TextView>(R.id.tvResultFirstAttempt)
+/*        var tvFirstAttempt = frameResult.findViewById<TextView>(R.id.tvResultFirstAttempt)
         when {
             isStrike -> tvFirstAttempt.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
             isSpare -> {
@@ -148,12 +148,12 @@ class BowlingActivity : BaseActivity(),BowlingContract.View, View.OnClickListene
                 tvFirstAttempt.background = ContextCompat.getDrawable(this, R.color.white)
                 tvFirstAttempt.text = score.toString()
             }
-        }
+        }*/
 
     }
 
     override fun setResultSecondAttempt(isStrike: Boolean, isSpare: Boolean, score: Int) {
-        var tvSecondAttempt = frameResult.findViewById<TextView>(R.id.tvResultSecondAttempt)
+        /*var tvSecondAttempt = frameResult.findViewById<TextView>(R.id.tvResultSecondAttempt)
         when {
             isStrike -> tvSecondAttempt.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
             isSpare -> {
@@ -164,11 +164,11 @@ class BowlingActivity : BaseActivity(),BowlingContract.View, View.OnClickListene
                 tvSecondAttempt.background = ContextCompat.getDrawable(this, R.color.white)
                 tvSecondAttempt.text = score.toString()
             }
-        }
+        }*/
     }
 
     override fun setResultThirdAttempt(isStrike: Boolean, isSpare: Boolean, score: Int) {
-        var tvSecondAttempt = frameResult.findViewById<TextView>(R.id.tvResultThirdAttempt)
+        /*var tvSecondAttempt = frameResult.findViewById<TextView>(R.id.tvResultThirdAttempt)
         when {
             isStrike -> tvSecondAttempt.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
             isSpare -> {
@@ -178,11 +178,11 @@ class BowlingActivity : BaseActivity(),BowlingContract.View, View.OnClickListene
                 tvSecondAttempt.background = ContextCompat.getDrawable(this, R.color.white)
                 tvSecondAttempt.text = score.toString()
             }
-        }
+        }*/
     }
 
     override fun setResultLastFrame(total: Int) {
-        tvLastFrameResult.text = total.toString()
+        //tvLastFrameResult.text = total.toString()
     }
 
     override fun resetViews() {
@@ -221,6 +221,41 @@ class BowlingActivity : BaseActivity(),BowlingContract.View, View.OnClickListene
             var v = it.findViewById<TextView>(R.id.tvSecondAttempt)
             v.text = ""
             v.background = ContextCompat.getDrawable(this,R.drawable.shape_triangle)
+        }
+    }
+
+    override fun renderLastFrame(viewIndex: Int, strike: Boolean, spare: Boolean, shotInput: Int?) {
+        activeFrame?.let {
+            when(viewIndex){
+                0 -> {
+                    var firstView = it.findViewById<TextView>(R.id.tvFirstAttempt)
+                    if(strike){
+                        firstView.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
+                    }else{
+                        firstView.text = shotInput.toString()
+                    }
+                }
+                1 -> {
+                    var secondView = it.findViewById<TextView>(R.id.tvSecondAttempt)
+                    if(strike){
+                        secondView.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
+                    }else if(spare){
+                        secondView.background = ContextCompat.getDrawable(this, R.drawable.shape_triangle)
+                    }else{
+                        secondView.text = shotInput.toString()
+                    }
+                }
+                2 -> {
+                    var thirdView = it.findViewById<TextView>(R.id.tvThirdAttempt)
+                    if(strike){
+                        thirdView.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
+                    }else{
+                        thirdView.text = shotInput.toString()
+                    }
+                }
+            }
+
+
         }
     }
 }

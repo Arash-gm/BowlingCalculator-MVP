@@ -6,8 +6,9 @@ package com.arash.bowlingcalculator.util
 
 object util{
     val INITIAL_FRAME_INDEX = 0
-    val NUMBER_OF_FRAMES = 12
+    val NUMBER_OF_FRAMES = 10
     val STRIKE_SHOT = 10
+    val MAX_SCORE = 300
     val ANIMATION_DURATION = 400L
     val INITIAL_ALPHA = 0.4f
 

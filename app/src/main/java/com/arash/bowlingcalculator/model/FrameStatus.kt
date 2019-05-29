@@ -8,7 +8,7 @@ import kotlin.collections.ArrayList
  */
 
 data class FrameStatus ( val frameList: ArrayList<Frame> = arrayListOf()
-                       , val strikeList : Queue<Frame> = LinkedList()
+                       , val bonusPointQueue : LinkedList<Int> = LinkedList()
                        , var previousFrame: Frame? = Frame()
                        , var currentFrame: Frame = Frame()
                        , var total: Int = 0)

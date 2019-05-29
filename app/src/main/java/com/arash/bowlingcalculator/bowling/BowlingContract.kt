@@ -14,7 +14,7 @@ interface BowlingContract {
     interface View: BaseView<Presenter> {
         fun setActiveFrame(index: Int)
         fun showSnackBarMsg(@StringRes msg: Int)
-        fun renderStrikeFrame(currentFrame: Frame)
+        fun renderStrikeFrame()
         fun setStrikeFrameInRowResult(frameIndex: Int,score: Int)
         fun setLastFrameActive()
         fun setResultFirstAttempt(isStrike: Boolean = false, isSpare:Boolean = false, score: Int = 0)
@@ -27,6 +27,7 @@ interface BowlingContract {
         fun setFrameSecondAttempt(secondAttempt: Int)
         fun setFrameResult(result: Int)
         fun renderSpareFrame(currentFrame: Frame)
+        fun renderLastFrame(viewIndex: Int = 0, strike: Boolean = false, spare: Boolean = false, shotInput: Int? = null)
     }
 
     interface Presenter: BasePresenter<View> {

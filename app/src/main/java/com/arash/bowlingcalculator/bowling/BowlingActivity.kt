@@ -134,58 +134,6 @@ class BowlingActivity : BaseActivity(),BowlingContract.View, View.OnClickListene
         hsv.smoothScrollTo((endPos + halfWidth).toInt(), 0)
     }
 
-    override fun setLastFrameActive() {
-        //activeFrame = frameResult.findViewById<TextView>(R.id.frameResultCardView)
-    }
-
-    override fun setResultFirstAttempt(isStrike: Boolean, isSpare: Boolean, score: Int) {
-/*        var tvFirstAttempt = frameResult.findViewById<TextView>(R.id.tvResultFirstAttempt)
-        when {
-            isStrike -> tvFirstAttempt.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
-            isSpare -> {
-
-            }
-            else -> {
-                tvFirstAttempt.background = ContextCompat.getDrawable(this, R.color.white)
-                tvFirstAttempt.text = score.toString()
-            }
-        }*/
-
-    }
-
-    override fun setResultSecondAttempt(isStrike: Boolean, isSpare: Boolean, score: Int) {
-        /*var tvSecondAttempt = frameResult.findViewById<TextView>(R.id.tvResultSecondAttempt)
-        when {
-            isStrike -> tvSecondAttempt.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
-            isSpare -> {
-                tvSecondAttempt.background = ContextCompat.getDrawable(this, R.drawable.shape_triangle)
-                tvSecondAttempt.text = ""
-            }
-            else -> {
-                tvSecondAttempt.background = ContextCompat.getDrawable(this, R.color.white)
-                tvSecondAttempt.text = score.toString()
-            }
-        }*/
-    }
-
-    override fun setResultThirdAttempt(isStrike: Boolean, isSpare: Boolean, score: Int) {
-        /*var tvSecondAttempt = frameResult.findViewById<TextView>(R.id.tvResultThirdAttempt)
-        when {
-            isStrike -> tvSecondAttempt.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
-            isSpare -> {
-
-            }
-            else -> {
-                tvSecondAttempt.background = ContextCompat.getDrawable(this, R.color.white)
-                tvSecondAttempt.text = score.toString()
-            }
-        }*/
-    }
-
-    override fun setResultLastFrame(total: Int) {
-        //tvLastFrameResult.text = total.toString()
-    }
-
     override fun resetViews() {
         this.recreate()
     }
@@ -242,6 +190,7 @@ class BowlingActivity : BaseActivity(),BowlingContract.View, View.OnClickListene
                         secondView.background = ContextCompat.getDrawable(this, R.color.colorPrimary)
                     }else if(spare){
                         secondView.background = ContextCompat.getDrawable(this, R.drawable.shape_triangle)
+                        secondView.text = ""
                     }else{
                         secondView.text = shotInput.toString()
                     }

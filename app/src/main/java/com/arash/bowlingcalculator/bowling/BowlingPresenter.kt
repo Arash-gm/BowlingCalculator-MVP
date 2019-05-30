@@ -8,6 +8,7 @@ import com.arash.bowlingcalculator.util.util.NUMBER_OF_FRAMES
 import com.arash.bowlingcalculator.util.util.SPARE_BONUS_POINT
 import com.arash.bowlingcalculator.util.util.STRIKE_BONUS_POINT
 import com.arash.bowlingcalculator.util.util.STRIKE_SHOT
+import com.arash.bowlingcalculator.util.util.isShotSpare
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
@@ -49,9 +50,7 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
     }
 
     fun performShot(shotInput: Int){
-        if(frameStatus.total >= MAX_SCORE || isGameOver){
-            return
-        }
+        if(frameStatus.total >= MAX_SCORE || isGameOver) return
         shotObservable.onNext(shotInput)
         when (shotInput) {
             STRIKE_SHOT -> performStrikeShot()
@@ -60,27 +59,36 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
     }
 
     fun performNormalShot(shotInput: Int) {
-        frameStatus.apply {
-            if(shotInput + currentFrame.result > STRIKE_SHOT){
+        frameStatus.currentFrame.apply {
+            if(isShotRangeValid(shotInput,result)){
                 view?.showSnackBarMsg(R.string.invalid_shot)
                 return
             }
-            if(shotInput + currentFrame.result == STRIKE_SHOT){
+            if(isShotSpare(shotInput,result)){
                 performSpareShot(shotInput)
                 return
             }
-            if(currentFrame.firstAttempt == null) {
-                currentFrame.firstAttempt = shotInput
-                currentFrame.result += shotInput
-                view?.setFrameFirstAttempt(shotInput)
-            }
-            else {
-                currentFrame.secondAttempt = shotInput
-                currentFrame.result += shotInput
-                frameStatus.total += currentFrame.result
-                view?.setFrameSecondAttempt(shotInput)
-                view?.setFrameResult(total)
-                prepareNextFrame(currentFrame)
+            when {
+                firstAttempt == null -> {
+                    firstAttempt = shotInput
+                    result += shotInput
+                    view?.setFrameFirstAttempt(shotInput)
+                }
+                secondAttempt == null -> {
+                    secondAttempt = shotInput
+                    result += shotInput
+                    frameStatus.total += result
+                    view?.setFrameSecondAttempt(shotInput)
+                    view?.setFrameResult(frameStatus.total)
+                    prepareNextFrame(this)
+                }
+                else -> {
+                    if(firstAttempt!! + secondAttempt!! != STRIKE_SHOT){
+                        gameOver()
+                    }
+                    thirdAttempt = shotInput
+                    handleLastFrameData(isSpare = false,isStrike = false,shotInput = shotInput)
+                }
             }
         }
     }
@@ -112,29 +120,10 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
         }.subscribe {
             var frameToRender = updateQueueOnShot(it)
             frameToRender?.let {
-                if (activeFrameIndex == NUMBER_OF_FRAMES - 1 && frameToRender.result == 20) {
-                    frameToRender.result += STRIKE_SHOT
-                }
                 frameStatus.total += frameToRender.result
                 view?.setStrikeFrameInRowResult(frameStatus.frameList.indexOf(frameToRender), frameStatus.total)
                 disposableArray.remove().dispose()
-                //removeBonusPointHead()
             }
-            /*var bonusPoint = getBonusPointHead()
-            bonusPoint--
-            updateBonusPointHead(bonusPoint)
-            frameToRender.result += it
-
-            if (bonusPoint == 0) {
-                if (setResultIndex == NUMBER_OF_FRAMES - 1 && frameToRender.result == 20) {
-                    frameToRender.result += STRIKE_SHOT
-                }
-                frameStatus.total += frameToRender.result
-                view?.setStrikeFrameInRowResult(setResultIndex, frameStatus.total)
-                disposableArray.remove().dispose()
-                removeBonusPointHead()
-                incrementSetResultIndex()
-            }*/
         }
         compositeDisposable.add(subscription)
     }
@@ -159,35 +148,15 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
     }
 
     fun updateQueueOnShot(shotInput: Int): Frame?{
-        /*var iterator = frameStatus.bonusPointQueue.iterator()
         var frameToRender: Frame? = null
-        while (iterator.hasNext()){
-            var entry = iterator.next()
-            when(entry.second){
-                0 -> {
-                    frameToRender = entry.first
-                    removeBonusPointHead()
-                }
-                else -> performQueueUpdate(entry)
-            }
-        }*/
-        var frameToRender: Frame? = null
-        //var newArray : ArrayList<Pair<Frame,Int>> = arrayListOf()
         var queueHead = getBonusPointHead()
         when(queueHead.second){
             0 -> {
                 frameToRender = queueHead.first
                 removeBonusPointHead()
-                var queueHead = getBonusPointHead()
-                queueHead.first.result += shotInput
-                var newEntry = Pair(queueHead.first,queueHead.second - 1)
-                updateBonusPointHead(newEntry)
+                fetchAndUpdateBonusListHead(shotInput)
             }
             else -> {
-                /*queueHead.first.result += shotInput
-                var newEntry = Pair(queueHead.first,queueHead.second - 1)
-                updateBonusPointHead(newEntry)*/
-
                 queueHead.first.result += shotInput
                 var newEntry = Pair(queueHead.first,queueHead.second - 1)
 
@@ -195,10 +164,7 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
                     frameToRender = queueHead.first
                     removeBonusPointHead()
                     if(frameStatus.bonusPointQueue.size > 0){
-                        var queueHead = getBonusPointHead()
-                        queueHead.first.result += shotInput
-                        var newEntry = Pair(queueHead.first,queueHead.second - 1)
-                        updateBonusPointHead(newEntry)
+                        fetchAndUpdateBonusListHead(shotInput)
                     }
                 }else{
                     updateBonusPointHead(newEntry)
@@ -209,10 +175,11 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
         return frameToRender
     }
 
-    private fun performQueueUpdate(entry: Pair<Frame, Int>) {
-        var newBonusPoint = entry.second
-        var newPair : Pair<Frame,Int> = Pair(entry.first,--newBonusPoint)
-        updateBonusPointHead(newPair)
+    private fun fetchAndUpdateBonusListHead(shotInput: Int){
+        var queueHead = getBonusPointHead()
+        queueHead.first.result += shotInput
+        var newEntry = Pair(queueHead.first,queueHead.second - 1)
+        updateBonusPointHead(newEntry)
     }
 
     private fun removeBonusPointHead(){
@@ -261,20 +228,28 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
 
     fun handleLastFrameData(isStrike: Boolean = false,isSpare: Boolean = false, shotInput: Int? = null){
         frameStatus.apply {
-            var index = lastFrameViewRenderArray.indexOfFirst { !it }
-            if(index == -1) return
-            view?.renderLastFrame(index,isStrike,isSpare,shotInput)
-            lastFrameViewRenderArray[index] = true
+            when{
+                isStrike -> {
+                    var index = lastFrameViewRenderArray.indexOfFirst { !it }
+                    if(index == -1) return
+                    view?.renderLastFrame(index,isStrike,isSpare,shotInput)
+                    lastFrameViewRenderArray[index] = true
+                }
+                isSpare -> {
+                    view?.renderLastFrame(1,isStrike,isSpare,shotInput)
+                    lastFrameViewRenderArray[1] = true
+                }
+                else -> {
+                    view?.renderLastFrame(2,isStrike,isSpare,shotInput)
+                    lastFrameViewRenderArray[2] = true
+                }
+            }
+
         }
     }
 
-/*    fun incrementSetResultIndex(){
-        if(setResultIndex == NUMBER_OF_FRAMES - 1)return
-        setResultIndex++
-    }*/
-
-    fun getActiveFrameIndex(): Int{
-        return activeFrameIndex
+    fun isShotRangeValid(shotInput: Int,result: Int): Boolean{
+        return shotInput + result > STRIKE_SHOT && activeFrameIndex != NUMBER_OF_FRAMES - 1
     }
 
     override fun resetCalc() {

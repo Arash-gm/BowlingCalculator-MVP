@@ -25,7 +25,7 @@ class BowlingRobot : BaseTestRobot(){
     fun checkHsvVisibility() = checkViewVisibility(R.id.hsv)
 
     fun checkFrameCardVisibility() = checkViewVisibility(R.id.frameCard)
-    fun checkFrameCardChildCount() = checkFrameCardChildCount(R.id.frameCard, STRIKE_SHOT - 1)
+    fun checkFrameCardChildCount() = checkFrameCardChildCount(R.id.frameCard, STRIKE_SHOT)
 
     fun pressFabButton() = pressButton(R.id.fab)
     fun setInputField(shotInput: String) = setInputField(edtInput,shotInput)

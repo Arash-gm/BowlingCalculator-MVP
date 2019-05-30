@@ -6,6 +6,7 @@ import com.arash.bowlingcalculator.bowling.BowlingPresenter
 import com.arash.bowlingcalculator.model.Frame
 import com.arash.bowlingcalculator.model.FrameStatus
 import com.arash.bowlingcalculator.util.util
+import com.arash.bowlingcalculator.util.util.NUMBER_OF_FRAMES
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -36,7 +37,7 @@ abstract class BowlingActivityModule {
         fun provideFrameStatus(): FrameStatus {
             var frameStatus = FrameStatus()
 
-            for(i in 1..util.NUMBER_OF_FRAMES){
+            for(i in 1..NUMBER_OF_FRAMES){
                 var frame = Frame()
                 frameStatus.frameList.add(frame)
             }

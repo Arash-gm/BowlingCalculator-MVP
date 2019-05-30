@@ -24,6 +24,7 @@ import android.support.annotation.ColorInt
 import android.util.TypedValue
 import com.arash.bowlingcalculator.R
 import com.arash.bowlingcalculator.util.util.INITIAL_FRAME_INDEX
+import com.arash.bowlingcalculator.util.util.NUMBER_OF_FRAMES
 import com.arash.bowlingcalculator.util.util.isShotStrike
 
 /**

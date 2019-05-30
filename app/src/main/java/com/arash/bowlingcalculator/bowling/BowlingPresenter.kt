@@ -5,10 +5,12 @@ import com.arash.bowlingcalculator.model.Frame
 import com.arash.bowlingcalculator.model.FrameStatus
 import com.arash.bowlingcalculator.util.util.MAX_SCORE
 import com.arash.bowlingcalculator.util.util.NUMBER_OF_FRAMES
+import com.arash.bowlingcalculator.util.util.STRIKE_BONUS_POINT
 import com.arash.bowlingcalculator.util.util.STRIKE_SHOT
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -17,6 +19,7 @@ import javax.inject.Inject
 
 class BowlingPresenter @Inject constructor(view: BowlingContract.View ): BowlingContract.Presenter{
 
+    private var isGameOver: Boolean = false
     private var view: BowlingContract.View? = view
     private lateinit var frameStatus: FrameStatus
     private var activeFrameIndex: Int = 0
@@ -25,7 +28,7 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
 
     private val shotObservable = PublishSubject.create<Int>()
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
-    private val disposableArray: ArrayList<Disposable> = arrayListOf()
+    private val disposableArray: Queue<Disposable> = LinkedList()
 
     override fun start(frameStatus: FrameStatus,initialFrameIndex: Int) {
         this.frameStatus = frameStatus
@@ -44,9 +47,8 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
         }
     }
 
-
     fun performShot(shotInput: Int){
-        if(frameStatus.total >= MAX_SCORE){
+        if(frameStatus.total >= MAX_SCORE || isGameOver){
             return
         }
         shotObservable.onNext(shotInput)
@@ -56,35 +58,66 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
         }
     }
 
-    fun performStrikeShot() {
-        var frame = Frame(isStrike = true, secondAttempt = STRIKE_SHOT,result = STRIKE_SHOT)
-        addToBonusPointList(2)
-        var subscription = shotObservable.doOnSubscribe{t -> run{
-            disposableArray.add(t)
-        }}.subscribe{
-            var frameToCalc = frameStatus.frameList[setResultIndex]
-            var bonusPoint = getBonusPointHead()
-            bonusPoint--
-            updateBonusPointHead(bonusPoint)
-            frameToCalc.result += it
-            if(bonusPoint == 0){
-                if(setResultIndex == NUMBER_OF_FRAMES - 1 && frameToCalc.result == 20){
-                    frameToCalc.result += STRIKE_SHOT
-                }
-                frameStatus.total += frameToCalc.result
-                view?.setStrikeFrameInRowResult(setResultIndex,frameStatus.total)
-                disposableArray[setResultIndex].dispose()
-                incrementSetResultIndex()
-                removeBonusPointHead()
+    fun performNormalShot(shotInput: Int) {
+        frameStatus.apply {
+            if(shotInput + currentFrame.result == STRIKE_SHOT){
+                performSpareShot()
+                return
+            }
+            if(currentFrame.firstAttempt == null) {
+                currentFrame.firstAttempt = shotInput
+                currentFrame.result += shotInput
+                view?.setFrameFirstAttempt(shotInput)
+            }
+            else {
+                currentFrame.secondAttempt = shotInput
+                currentFrame.result += shotInput
+                frameStatus.total += currentFrame.result
+                view?.setFrameSecondAttempt(shotInput)
+                view?.setFrameResult(total)
+                prepareNextFrame(currentFrame)
             }
         }
-        compositeDisposable.add(subscription)
+    }
 
+    fun performStrikeShot() {
+        var frame = Frame(isStrike = true, secondAttempt = STRIKE_SHOT,result = STRIKE_SHOT)
+        handleBonusShot(STRIKE_BONUS_POINT)
         when(activeFrameIndex){
             NUMBER_OF_FRAMES - 1 -> handleLastFrameData(isStrike = true)
             else -> view?.renderStrikeFrame()
         }
         prepareNextFrame(frame)
+    }
+
+    private fun handleBonusShot(bonusPoint: Int) {
+        addToBonusPointList(bonusPoint)
+        var subscription = shotObservable.doOnSubscribe { t ->
+            run {
+                disposableArray.add(t)
+            }
+        }.subscribe {
+            var frameToRender = frameStatus.frameList[setResultIndex]
+            var bonusPoint = getBonusPointHead()
+            bonusPoint--
+            updateBonusPointHead(bonusPoint)
+            frameToRender.result += it
+            if (bonusPoint == 0) {
+                if (setResultIndex == NUMBER_OF_FRAMES - 1 && frameToRender.result == 20) {
+                    frameToRender.result += STRIKE_SHOT
+                }
+                frameStatus.total += frameToRender.result
+                view?.setStrikeFrameInRowResult(setResultIndex, frameStatus.total)
+                disposableArray.remove().dispose()
+                removeBonusPointHead()
+                incrementSetResultIndex()
+            }
+        }
+        compositeDisposable.add(subscription)
+    }
+
+    private fun performSpareShot(){
+
     }
 
     private fun removeBonusPointHead(){
@@ -100,10 +133,6 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
         return frameStatus.bonusPointQueue.push(bonusPoint)
     }
 
-    fun performNormalShot(shotInput: Int) {
-        //
-    }
-
     fun addToBonusPointList(int: Int){
         frameStatus.apply {
             bonusPointQueue.add(int)
@@ -111,15 +140,18 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
     }
 
     fun prepareNextFrame(frame: Frame){
-        if(activeFrameIndex == NUMBER_OF_FRAMES - 1){ return }
+        if(activeFrameIndex == NUMBER_OF_FRAMES - 1){
+            return
+        }
 
         frameStatus.apply {
             when(frameList.size){
                 0 -> frameList.add(frame)
                 else -> frameList[activeFrameIndex] = frame
             }
-            currentFrame = frameList[activeFrameIndex]
+
             incrementFrameIndex()
+            currentFrame = frameList[activeFrameIndex]
             setActiveFrameView()
         }
     }
@@ -152,5 +184,9 @@ class BowlingPresenter @Inject constructor(view: BowlingContract.View ): Bowling
 
     override fun resetCalc() {
         view?.resetViews()
+    }
+
+    private fun gameOver(){
+        isGameOver = true
     }
 }

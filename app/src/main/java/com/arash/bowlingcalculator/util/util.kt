@@ -9,6 +9,9 @@ object util{
     val NUMBER_OF_FRAMES = 10
     val STRIKE_SHOT = 10
     val MAX_SCORE = 300
+    val STRIKE_BONUS_POINT = 2
+    val SPARE_BONUS_POINT = 1
+    val NORMAL_BONUS_POINT = 0
     val ANIMATION_DURATION = 400L
     val INITIAL_ALPHA = 0.4f
 
